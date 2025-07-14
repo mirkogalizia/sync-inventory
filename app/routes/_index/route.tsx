@@ -1,58 +1,83 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+// app/routes/_index/route.tsx
 
-import { login } from "../../shopify.server";
+import type { LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { useLoaderData, Form } from "@remix-run/react";
+import { authenticate } from "~/shopify.server";
+import {
+  Page,
+  Layout,
+  Card,
+  Button,
+  TextField,
+  Heading,
+  Text,
+  InlineStack,
+} from "@shopify/polaris";
+import { TitleBar } from "@shopify/app-bridge-react";
 
-import styles from "./styles.module.css";
-
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const url = new URL(request.url);
-
-  if (url.searchParams.get("shop")) {
-    throw redirect(`/app?${url.searchParams.toString()}`);
-  }
-
-  return { showForm: Boolean(login) };
+export const loader: LoaderFunction = async ({ request }) => {
+  // Forza l’OAuth se non sei loggato
+  await authenticate.admin(request);
+  return json({});
 };
 
-export default function App() {
-  const { showForm } = useLoaderData<typeof loader>();
+export default function Index() {
+  useLoaderData(); // forza il loader
 
   return (
-    <div className={styles.index}>
-      <div className={styles.content}>
-        <h1 className={styles.heading}>A short heading about [your app]</h1>
-        <p className={styles.text}>
-          A tagline about [your app] that describes your value proposition.
-        </p>
-        {showForm && (
-          <Form className={styles.form} method="post" action="/auth/login">
-            <label className={styles.label}>
-              <span>Shop domain</span>
-              <input className={styles.input} type="text" name="shop" />
-              <span>e.g: my-shop-domain.myshopify.com</span>
-            </label>
-            <button className={styles.button} type="submit">
-              Log in
-            </button>
-          </Form>
-        )}
-        <ul className={styles.list}>
-          <li>
-            <strong>Product feature</strong>. Some detail about your feature and
-            its benefit to your customer.
-          </li>
-          <li>
-            <strong>Product feature</strong>. Some detail about your feature and
-            its benefit to your customer.
-          </li>
-          <li>
-            <strong>Product feature</strong>. Some detail about your feature and
-            its benefit to your customer.
-          </li>
-        </ul>
-      </div>
-    </div>
+    <Page>
+      <TitleBar title="Sync Inventory" />
+      <Layout>
+        {/* Intro */}
+        <Layout.Section>
+          <Card sectioned>
+            <Heading>Benvenuto in Sync Inventory</Heading>
+            <Text>
+              Qui configuri i “blanks” per taglia, colore e tipologia, e sincronizzi
+              automaticamente il magazzino al variare delle vendite.
+            </Text>
+          </Card>
+        </Layout.Section>
+
+        {/* Form di sincronizzazione */}
+        <Layout.Section>
+          <Card title="Avvia sincronizzazione" sectioned>
+            <Form method="post" action="/api/sync">
+              <InlineStack gap="4">
+                <TextField
+                  label="Dominio del negozio"
+                  name="shop"
+                  placeholder="tuo-store.myshopify.com"
+                  autoComplete="off"
+                />
+                <Button primary submit>
+                  Sincronizza
+                </Button>
+              </InlineStack>
+            </Form>
+          </Card>
+        </Layout.Section>
+
+        {/* Specs (opzionale) */}
+        <Layout.Section secondary>
+          <Card title="Specifiche progetto" sectioned>
+            <Text>
+              <strong>Framework:</strong> Remix
+            </Text>
+            <Text>
+              <strong>Session storage:</strong> In-memory (test)
+            </Text>
+            <Text>
+              <strong>Interfaccia:</strong> Polaris & App Bridge
+            </Text>
+            <Text>
+              <strong>API:</strong> Admin GraphQL
+            </Text>
+          </Card>
+        </Layout.Section>
+      </Layout>
+    </Page>
   );
 }
+
