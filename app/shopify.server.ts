@@ -1,4 +1,5 @@
 // app/shopify.server.ts
+
 import "@shopify/shopify-app-remix/adapters/node";
 import {
   ApiVersion,
@@ -6,9 +7,8 @@ import {
   shopifyApp,
 } from "@shopify/shopify-app-remix/server";
 
-// Import CommonJS default then extract MemorySessionStorage
-import MemorySessionStorageModule from "@shopify/shopify-app-session-storage";
-const { MemorySessionStorage } = MemorySessionStorageModule;
+// Import del pacchetto in-memory adatto a Remix
+import { MemorySessionStorage } from "@shopify/shopify-app-session-storage-memory";
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY || "",
@@ -17,7 +17,7 @@ const shopify = shopifyApp({
   scopes: process.env.SCOPES?.split(","),
   appUrl: process.env.SHOPIFY_APP_URL || "",
   authPathPrefix: "/auth",
-  // ora funziona perché importiamo correttamente dal CJS
+  // Session storage in-memory (non serve DATABASE_URL)
   sessionStorage: new MemorySessionStorage(),
   distribution: AppDistribution.AppStore,
   future: {
@@ -37,3 +37,4 @@ export const unauthenticated = shopify.unauthenticated;
 export const login = shopify.login;
 export const registerWebhooks = shopify.registerWebhooks;
 export const sessionStorage = shopify.sessionStorage;
+
