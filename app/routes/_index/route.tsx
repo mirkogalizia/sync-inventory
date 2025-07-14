@@ -10,9 +10,8 @@ import {
   Card,
   Button,
   TextField,
-  Heading,
   Text,
-  InlineStack,
+  Inline,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 
@@ -32,7 +31,9 @@ export default function Index() {
         {/* Intro */}
         <Layout.Section>
           <Card sectioned>
-            <Heading>Benvenuto in Sync Inventory</Heading>
+            <Text as="h2" variant="headingLg">
+              Benvenuto in Sync Inventory
+            </Text>
             <Text>
               Qui configuri i “blanks” per taglia, colore e tipologia, e sincronizzi
               automaticamente il magazzino al variare delle vendite.
@@ -44,7 +45,7 @@ export default function Index() {
         <Layout.Section>
           <Card title="Avvia sincronizzazione" sectioned>
             <Form method="post" action="/api/sync">
-              <InlineStack gap="4">
+              <Inline align="baseline" blockAlign="stretch" gap="4">
                 <TextField
                   label="Dominio del negozio"
                   name="shop"
@@ -54,7 +55,7 @@ export default function Index() {
                 <Button primary submit>
                   Sincronizza
                 </Button>
-              </InlineStack>
+              </Inline>
             </Form>
           </Card>
         </Layout.Section>
