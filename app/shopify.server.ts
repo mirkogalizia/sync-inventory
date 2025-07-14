@@ -1,12 +1,14 @@
 // app/shopify.server.ts
-
 import "@shopify/shopify-app-remix/adapters/node";
 import {
   ApiVersion,
   AppDistribution,
   shopifyApp,
 } from "@shopify/shopify-app-remix/server";
-import { MemorySessionStorage } from "@shopify/shopify-app-session-storage";
+
+// Import CommonJS default then extract MemorySessionStorage
+import MemorySessionStorageModule from "@shopify/shopify-app-session-storage";
+const { MemorySessionStorage } = MemorySessionStorageModule;
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY || "",
@@ -15,7 +17,7 @@ const shopify = shopifyApp({
   scopes: process.env.SCOPES?.split(","),
   appUrl: process.env.SHOPIFY_APP_URL || "",
   authPathPrefix: "/auth",
-  // Use in-memory session storage instead of Prisma
+  // ora funziona perché importiamo correttamente dal CJS
   sessionStorage: new MemorySessionStorage(),
   distribution: AppDistribution.AppStore,
   future: {
